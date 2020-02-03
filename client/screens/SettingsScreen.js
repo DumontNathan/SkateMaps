@@ -1,11 +1,12 @@
-import React, { Component } from "react";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-elements";
 import { withFirebaseHOC } from "../config/Firebase";
 
-class SettingsScreen extends Component {
+
+class SettingsScreen extends React.Component {
+
   handleSignOut = async () => {
-    console.log("Hoho");
     try {
       await this.props.firebase.signOut();
       this.props.navigation.navigate("Auth");
@@ -18,14 +19,13 @@ class SettingsScreen extends Component {
     return (
       <View style={styles.container}>
         <Button
-          title="Signout"
+          title="Se déconnecter"
           onPress={() => {
-            this.handleSignout;
+            this.handleSignOut();
           }}
-          titleStyle={{
-            color: "#F57C00"
-          }}
-          type="clear"
+          titleStyle={{ color: "white" }}
+          buttonStyle={{ backgroundColor: "black" }}
+          type="outline"
         />
       </View>
     );
@@ -42,5 +42,5 @@ const styles = StyleSheet.create({
 export default withFirebaseHOC(SettingsScreen);
 
 SettingsScreen.navigationOptions = {
-  header: "none"
+  header: "Settings"
 };
