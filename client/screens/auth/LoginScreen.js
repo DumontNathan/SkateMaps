@@ -107,6 +107,7 @@ class LoginScreen extends React.Component {
                       placeholder="Votre mot de passe..."
                       secureTextEntry={passwordVisibility}
                       onChangeText={handleChange("password")}
+                      autoCapitalize="none"
                       iconName="ios-lock"
                       iconColor="#2C384A"
                       onBlur={handleBlur("password")}

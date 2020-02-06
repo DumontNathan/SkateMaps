@@ -26,7 +26,9 @@ class ProfileScreen extends React.Component {
           contentContainerStyle={styles.contentContainer}
         >
           <Text style={styles.hello}>Hello, {this.state.user.name}</Text>
-          <Text style={styles.email}>Your email is : {this.state.user.email}</Text>
+          <Text style={styles.email}>
+            Your email is : {this.state.user.email}
+          </Text>
         </ScrollView>
       </View>
     );
@@ -47,11 +49,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-  hello : {
+  hello: {
     fontSize: 40
   },
-  email : {
-    fontStyle : "italic"
+  email: {
+    fontStyle: "italic"
   }
 });
 
