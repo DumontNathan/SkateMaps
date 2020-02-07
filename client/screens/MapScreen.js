@@ -1,6 +1,13 @@
 import React from "react";
-import { SafeAreaView, StyleSheet, Dimensions, Text, View } from "react-native";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Dimensions,
+  Text,
+  View,
+  NativeMethodsMixin
+} from "react-native";
+import MapView, { PROVIDER_GOOGLE, Marker, Callout } from "react-native-maps";
 import mapStyle from "../components/mapStyle";
 
 const { width, height } = Dimensions.get("window");
@@ -20,7 +27,8 @@ export default class MapScreen extends React.Component {
         longitude: 0,
         latitudeDelta: 0.015,
         longitudeDelta: 0.0121
-      }
+      },
+      markers: []
     };
   }
 
@@ -44,13 +52,17 @@ export default class MapScreen extends React.Component {
     );
   }
 
-  onMapPress = coordinates => {
-    alert(
-      "Latitude : " +
-        coordinates.latitude +
-        " Longitude : " +
-        coordinates.longitude
-    );
+  onMapPress = e => {
+    this.setState({
+      markers: [
+        ...this.state.markers,
+        {
+          coordinate: e.nativeEvent.coordinate,
+          description: "Ceci est un spot de skate américain",
+          name : "El Torro"
+        }
+      ]
+    });
   };
 
   render() {
@@ -67,13 +79,15 @@ export default class MapScreen extends React.Component {
           showsCompass={true}
           toolbarEnabled={true}
           loadingEnabled={true}
-          onPress={e => {
-            this.onMapPress(e.nativeEvent.coordinate);
-          }}
+          onPress={this.onMapPress}
         >
-          {/* <View style={styles.tuto}>
-            <Text>Click on the map to get coordinates !</Text>
-          </View> */}
+          {this.state.markers.map(marker => (
+            <Marker coordinate={marker.coordinate}>
+              <Callout style={styles.callout}>
+              <Text style={styles.name}>{marker.name}</Text>
+              <Text style={styles.description}>{marker.description}</Text></Callout>
+            </Marker>
+          ))}
         </MapView>
       </SafeAreaView>
     );
@@ -95,10 +109,16 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject
   },
-  tuto : {
+  callout : {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: "center"
+  },
+  description : {
+    margin : 15
+  },
+  name: {
+    fontSize: 30,
+    fontWeight: "bold"
   }
 
 });
