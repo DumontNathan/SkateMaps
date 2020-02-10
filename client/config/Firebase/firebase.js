@@ -32,20 +32,26 @@ const Firebase = {
       .set(userData);
   },
 
-  getUser: (callback) => {
+  createNewMarker: markerData => {
+    return firebase
+      .firestore()
+      .collection("markers")
+      .add(markerData);
+  },
+
+  getUser: callback => {
     var userId = firebase.auth().currentUser.uid;
     var docRef = db.collection("users").doc(userId);
     docRef
       .get()
-      .then((doc) => {
+      .then(doc => {
         if (doc.exists) {
           var user = {
             name: doc.data().name,
             email: doc.data().email
           };
           // Callback used in front to get the data (because get() is asynchronous)
-          callback(user)
-          
+          callback(user);
         } else {
           // doc.data() will be undefined in this case
           console.log("No such document!");
@@ -53,6 +59,19 @@ const Firebase = {
       })
       .catch(function(error) {
         console.log("Error getting document:", error);
+      });
+  },
+
+  getAllMarkers: callback => {
+    db.collection("markers")
+      .get()
+      .then(function(querySnapshot) {
+        var markers = []
+        querySnapshot.forEach(function(doc) {
+          // doc.data() is never undefined for query doc snapshots
+          markers.push(doc.data())
+        });
+        callback(markers)
       });
   }
 };
