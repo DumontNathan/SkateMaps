@@ -13,6 +13,6 @@ npm start
 
 ```
 
-### Installing
+### Usage
 
 Then use QR code to run the app on Expo client
