@@ -7,20 +7,19 @@ import {
   View,
   Modal,
   TextInput,
-  Picker
+  Alert
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker, Callout } from "react-native-maps";
 import mapStyle from "../components/mapStyle";
-import FormButton from "../components/FormButton";
 import FormInput from "../components/FormInput";
 import ErrorMessage from "../components/ErrorMessage";
-import { Button, Input } from "react-native-elements";
+import { Button } from "react-native-elements";
 import { Formik } from "formik";
 import { withFirebaseHOC } from "../config/Firebase";
 
 const { width, height } = Dimensions.get("window");
 
-const SCREEN_HEIGHT = height - 45;
+const SCREEN_HEIGHT = height - 110;
 const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
@@ -81,7 +80,12 @@ class MapScreen extends React.Component {
   };
 
   handleAddMarker = () => {
-    this.setState({ addMarker : true });
+    if (this.state.addMarker) {
+      this.setState({ addMarker: false });
+    } else {
+      this.setState({ addMarker: true });
+      Alert.alert("Créer un marqueur ?", "Appuyez quelque part sur la carte pour créer un marqueur.")
+    }
   };
 
   handleNameChange = spotName => {
@@ -158,7 +162,7 @@ class MapScreen extends React.Component {
                     returnKeyType="done"
                   />
                 </View>
-                <FormButton
+                <Button
                   buttonType="outline"
                   onPress={this.handleSubmit}
                   title="Valider"
@@ -190,7 +194,6 @@ class MapScreen extends React.Component {
           showsUserLocation={true}
           showsMyLocationButton={true}
           followsUserLocation={true}
-          showsCompass={true}
           toolbarEnabled={true}
           loadingEnabled={true}
           onPress={this.onMapPress}
@@ -206,10 +209,23 @@ class MapScreen extends React.Component {
               </Callout>
             </Marker>
           ))}
-          <Button
-            title="Ajouter un marqueur"
-            onPress={this.handleAddMarker}
-          ></Button>
+          {this.state.addMarker ? (
+            <View>
+              <Button
+                title="Annuler"
+                onPress={this.handleAddMarker}
+                buttonStyle={{ backgroundColor: "white" }}
+                titleStyle={{ color: "black" }}
+              ></Button>
+            </View>
+          ) : (
+            <Button
+              raised
+              title="Ajouter un marqueur"
+              onPress={this.handleAddMarker}
+              buttonStyle={{ backgroundColor: "black" }}
+            ></Button>
+          )}
         </MapView>
       </SafeAreaView>
     );
