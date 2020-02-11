@@ -4,8 +4,7 @@ import {
   Text,
   View,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  SafeAreaView
+  KeyboardAvoidingView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import FormInput from "../../components/FormInput";

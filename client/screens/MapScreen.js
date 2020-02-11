@@ -7,7 +7,8 @@ import {
   View,
   Modal,
   TextInput,
-  Alert
+  Alert,
+  KeyboardAvoidingView
 } from "react-native";
 import ModalDropdown from "react-native-modal-dropdown";
 import MapView, { PROVIDER_GOOGLE, Marker, Callout } from "react-native-maps";
@@ -41,7 +42,8 @@ class MapScreen extends React.Component {
       newCoordinates: {},
       spotName: "",
       spotDescription: "",
-      spotType: ""
+      spotType: "",
+      pinColor: ""
     };
   }
 
@@ -83,6 +85,10 @@ class MapScreen extends React.Component {
   onDropdownSelect = (idx, value) => {
     var spotType = value;
     this.setState({ spotType: spotType });
+    if (spotType == "Street spot") this.setState({ pinColor: "green" });
+    else if (spotType == "Skatepark") this.setState({ pinColor: "blue" });
+    else if (spotType == "DIY spot") this.setState({ pinColor: "teal" });
+    else this.setState({ pinColor: "orange" });
   };
 
   handleAddMarker = () => {
@@ -110,7 +116,8 @@ class MapScreen extends React.Component {
       coordinate: this.state.newCoordinates,
       name: this.state.spotName,
       description: this.state.spotDescription,
-      type: this.state.spotType
+      type: this.state.spotType,
+      pinColor: this.state.pinColor
     };
 
     this.props.firebase.createNewMarker(markerData).then(
@@ -133,7 +140,8 @@ class MapScreen extends React.Component {
           transparent={true}
           visible={this.state.modalVisible}
         >
-          <View
+          <KeyboardAvoidingView
+            behavior="padding"
             style={{
               flex: 1,
               flexDirection: "column",
@@ -144,13 +152,27 @@ class MapScreen extends React.Component {
             <View
               style={{
                 width: 320,
-                height: 550,
+                height: 440,
                 backgroundColor: "white",
                 borderWidth: 1,
                 borderRadius: 10,
                 alignItems: "center"
               }}
             >
+              <Button
+                onPress={() => {
+                  this.setState({ modalVisible: false });
+                }}
+                buttonType="outline"
+                title="X"
+                titleStyle={{ color: "white" }}
+                buttonStyle={{
+                  backgroundColor: "orange",
+                  width: 318,
+                  borderTopEndRadius: 8,
+                  borderTopStartRadius: 8
+                }}
+              ></Button>
               <Text style={styles.modalTitle}>Créer un marqueur</Text>
               <View style={styles.inputcontainer}>
                 <View style={styles.dropdownContainer}>
@@ -162,6 +184,7 @@ class MapScreen extends React.Component {
                     textStyle={styles.dropdownText}
                     dropdownStyle={styles.dropdownStyle}
                     dropdownTextStyle={styles.dropdownTextStyle}
+                    dropdownTextHighlightStyle={{ backgroundColor: "orange" }}
                   />
                 </View>
                 <FormInput
@@ -179,7 +202,6 @@ class MapScreen extends React.Component {
                     placeholderTextColor="grey"
                     numberOfLines={5}
                     multiline={true}
-                    returnKeyType="done"
                   />
                 </View>
                 <Button
@@ -193,17 +215,8 @@ class MapScreen extends React.Component {
                   // loading={isSubmitting}
                 />
               </View>
-              <Button
-                onPress={() => {
-                  this.setState({ modalVisible: false });
-                }}
-                buttonType="outline"
-                title="Annuler"
-                titleStyle={{ color: "white" }}
-                buttonStyle={{ backgroundColor: "black" }}
-              ></Button>
             </View>
-          </View>
+          </KeyboardAvoidingView>
         </Modal>
 
         <MapView
@@ -222,6 +235,7 @@ class MapScreen extends React.Component {
             <Marker
               coordinate={marker.coordinate}
               key={JSON.stringify(marker.coordinate)}
+              pinColor={marker.pinColor}
             >
               <Callout style={styles.callout}>
                 <Text style={styles.name}>{marker.name}</Text>
@@ -280,16 +294,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold"
   },
   modalTitle: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: "bold",
     marginTop: 10,
-    marginBottom: 20
+    marginBottom: 10
   },
   coordinate: {
     fontSize: 10
   },
   inputcontainer: {
-    width: 300,
+    width: 280,
     margin: 5
   },
   textAreaContainer: {
@@ -305,11 +319,20 @@ const styles = StyleSheet.create({
   dropdownButton: {
     backgroundColor: "black",
     height: 35,
-    width: 150,
+    width: 200,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 15,
-    borderRadius: 5
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+
+    elevation: 3
   },
   dropdownContainer: {
     alignItems: "center"
@@ -318,10 +341,13 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20
   },
-  dropdownStyle : {
+  dropdownStyle: {
+    width: 130,
+    height: 115,
+    alignItems: "center"
   },
-  dropdownTextStyle : {
-    color : "black",
+  dropdownTextStyle: {
+    color: "black",
     fontSize: 20
   }
 });
