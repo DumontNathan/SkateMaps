@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -9,14 +9,12 @@ import {
   TextInput,
   Alert
 } from "react-native";
+import ModalDropdown from "react-native-modal-dropdown";
 import MapView, { PROVIDER_GOOGLE, Marker, Callout } from "react-native-maps";
 import mapStyle from "../components/mapStyle";
 import FormInput from "../components/FormInput";
-import ErrorMessage from "../components/ErrorMessage";
 import { Button } from "react-native-elements";
-import { Formik } from "formik";
 import { withFirebaseHOC } from "../config/Firebase";
-
 const { width, height } = Dimensions.get("window");
 
 const SCREEN_HEIGHT = height - 110;
@@ -24,6 +22,8 @@ const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+const DropdownOptions = ["Street spot", "Skatepark", "DIY spot", "Skateshop"];
 
 class MapScreen extends React.Component {
   constructor() {
@@ -40,7 +40,8 @@ class MapScreen extends React.Component {
       modalVisible: false,
       newCoordinates: {},
       spotName: "",
-      spotDescription: ""
+      spotDescription: "",
+      spotType: ""
     };
   }
 
@@ -79,12 +80,20 @@ class MapScreen extends React.Component {
     }
   };
 
+  onDropdownSelect = (idx, value) => {
+    var spotType = value;
+    this.setState({ spotType: spotType });
+  };
+
   handleAddMarker = () => {
     if (this.state.addMarker) {
       this.setState({ addMarker: false });
     } else {
       this.setState({ addMarker: true });
-      Alert.alert("Créer un marqueur ?", "Appuyez quelque part sur la carte pour créer un marqueur.")
+      Alert.alert(
+        "Créer un marqueur ?",
+        "Appuyez quelque part sur la carte pour créer un marqueur."
+      );
     }
   };
 
@@ -100,16 +109,20 @@ class MapScreen extends React.Component {
     const markerData = {
       coordinate: this.state.newCoordinates,
       name: this.state.spotName,
-      description: this.state.spotDescription
+      description: this.state.spotDescription,
+      type: this.state.spotType
     };
 
-    this.props.firebase
-      .createNewMarker(markerData)
-      .then(
-        this.setState({ modalVisible: false }),
-        this.setState({ addMarker: false }),
-        this.props.firebase.getAllMarkers(this.onMarkersReceived)
-      );
+    this.props.firebase.createNewMarker(markerData).then(
+      this.setState({
+        modalVisible: false,
+        addMarker: false,
+        spotDescription: "",
+        spotName: "",
+        spotType: ""
+      }),
+      this.props.firebase.getAllMarkers(this.onMarkersReceived)
+    );
   };
 
   render() {
@@ -139,11 +152,18 @@ class MapScreen extends React.Component {
               }}
             >
               <Text style={styles.modalTitle}>Créer un marqueur</Text>
-              <Text style={styles.coordinate}>
-                Longitude : {this.state.newCoordinates.longitude} {"\n"}
-                Latitude : {this.state.newCoordinates.latitude}
-              </Text>
               <View style={styles.inputcontainer}>
+                <View style={styles.dropdownContainer}>
+                  <Text>Sélectionnez un type de marqueur :</Text>
+                  <ModalDropdown
+                    style={styles.dropdownButton}
+                    options={DropdownOptions}
+                    onSelect={this.onDropdownSelect}
+                    textStyle={styles.dropdownText}
+                    dropdownStyle={styles.dropdownStyle}
+                    dropdownTextStyle={styles.dropdownTextStyle}
+                  />
+                </View>
                 <FormInput
                   placeholderTextColor="grey"
                   name="Nom"
@@ -205,6 +225,7 @@ class MapScreen extends React.Component {
             >
               <Callout style={styles.callout}>
                 <Text style={styles.name}>{marker.name}</Text>
+                <Text>Type : {marker.type}</Text>
                 <Text style={styles.description}>{marker.description}</Text>
               </Callout>
             </Marker>
@@ -281,14 +302,27 @@ const styles = StyleSheet.create({
     height: 100,
     justifyContent: "flex-start"
   },
-  onePicker: {
+  dropdownButton: {
+    backgroundColor: "black",
+    height: 35,
     width: 150,
-    height: 100,
-    marginTop: 20,
-    marginBottom: 10
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 15,
+    borderRadius: 5
   },
-  onePickerItem: {
-    height: 100
+  dropdownContainer: {
+    alignItems: "center"
+  },
+  dropdownText: {
+    color: "white",
+    fontSize: 20
+  },
+  dropdownStyle : {
+  },
+  dropdownTextStyle : {
+    color : "black",
+    fontSize: 20
   }
 });
 
