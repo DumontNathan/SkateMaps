@@ -1,5 +1,6 @@
 import React from "react";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
+import { Button } from "react-native-elements";
 import { withFirebaseHOC } from "../config/Firebase";
 
 class ProfileScreen extends React.Component {
@@ -18,6 +19,15 @@ class ProfileScreen extends React.Component {
     this.setState({ user: user });
   };
 
+  handleSignOut = async () => {
+    try {
+      await this.props.firebase.signOut();
+      this.props.navigation.navigate("Auth");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   render() {
     return (
       <View style={styles.container}>
@@ -29,6 +39,16 @@ class ProfileScreen extends React.Component {
           <Text style={styles.email}>
             Your email is : {this.state.user.email}
           </Text>
+
+          <Button
+            title="Se déconnecter"
+            onPress={() => {
+              this.handleSignOut();
+            }}
+            titleStyle={{ color: "white" }}
+            buttonStyle={{ backgroundColor: "black" }}
+            type="outline"
+          />
         </ScrollView>
       </View>
     );

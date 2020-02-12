@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from "react-navigation-tabs";
 import TabBarIcon from "../components/TabBarIcon";
 import ProfileScreen from "../screens/ProfileScreen";
 import MapScreen from "../screens/MapScreen";
+import MarkerInfoScreen from "../screens/MarkerInfos"
 import SettingsScreen from "../screens/SettingsScreen";
 
 const config = Platform.select({
@@ -34,7 +35,8 @@ ProfileStack.path = "";
 
 const MapStack = createStackNavigator(
   {
-    Map: MapScreen
+    Map: MapScreen,
+    MarkerInfos: MarkerInfoScreen
   },
   config
 );
@@ -51,29 +53,29 @@ MapStack.navigationOptions = {
 
 MapStack.path = "";
 
-const SettingsStack = createStackNavigator(
-  {
-    Settings: SettingsScreen
-  },
-  config
-);
+// const SettingsStack = createStackNavigator(
+//   {
+//     Settings: SettingsScreen
+//   },
+//   config
+// );
 
-SettingsStack.navigationOptions = {
-  tabBarLabel: "Settings",
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === "ios" ? "ios-options" : "md-options"}
-    />
-  )
-};
+// SettingsStack.navigationOptions = {
+//   tabBarLabel: "Settings",
+//   tabBarIcon: ({ focused }) => (
+//     <TabBarIcon
+//       focused={focused}
+//       name={Platform.OS === "ios" ? "ios-options" : "md-options"}
+//     />
+//   )
+// };
 
-SettingsStack.path = "";
+// SettingsStack.path = "";
 
 const tabNavigator = createBottomTabNavigator({
   ProfileStack,
   MapStack,
-  SettingsStack
+  // SettingsStack
 });
 
 tabNavigator.path = "";

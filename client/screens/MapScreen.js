@@ -16,8 +16,8 @@ import mapStyle from "../components/mapStyle";
 import FormInput from "../components/FormInput";
 import { Button } from "react-native-elements";
 import { withFirebaseHOC } from "../config/Firebase";
-const { width, height } = Dimensions.get("window");
 
+const { width, height } = Dimensions.get("window");
 const SCREEN_HEIGHT = height - 110;
 const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
@@ -52,20 +52,17 @@ class MapScreen extends React.Component {
       position => {
         var lat = parseFloat(position.coords.latitude);
         var long = parseFloat(position.coords.longitude);
-
         var currentPosition = {
           latitude: lat,
           longitude: long,
           latitudeDelta: LATITUDE_DELTA,
           longitudeDelta: LONGITUDE_DELTA
         };
-
         this.setState({ region: currentPosition });
       },
       error => alert(JSON.stringify(error)),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     );
-
     this.props.firebase.getAllMarkers(this.onMarkersReceived);
   }
 
@@ -103,6 +100,10 @@ class MapScreen extends React.Component {
     }
   };
 
+  handleMarkerInfos = () => {
+    this.props.navigation.navigate("MarkerInfos");
+  };
+
   handleNameChange = spotName => {
     this.setState({ spotName });
   };
@@ -119,7 +120,6 @@ class MapScreen extends React.Component {
       type: this.state.spotType,
       pinColor: this.state.pinColor
     };
-
     this.props.firebase.createNewMarker(markerData).then(
       this.setState({
         modalVisible: false,
@@ -142,36 +142,17 @@ class MapScreen extends React.Component {
         >
           <KeyboardAvoidingView
             behavior="padding"
-            style={{
-              flex: 1,
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
+            style={styles.modalBackground}
           >
-            <View
-              style={{
-                width: 320,
-                height: 440,
-                backgroundColor: "white",
-                borderWidth: 1,
-                borderRadius: 10,
-                alignItems: "center"
-              }}
-            >
+            <View style={styles.modalContainer}>
               <Button
                 onPress={() => {
                   this.setState({ modalVisible: false });
                 }}
                 buttonType="outline"
                 title="X"
-                titleStyle={{ color: "white" }}
-                buttonStyle={{
-                  backgroundColor: "orange",
-                  width: 318,
-                  borderTopEndRadius: 8,
-                  borderTopStartRadius: 8
-                }}
+                titleStyle={{ color: "white", fontWeight: "bold" }}
+                buttonStyle={styles.modalQuit}
               ></Button>
               <Text style={styles.modalTitle}>Créer un marqueur</Text>
               <View style={styles.inputcontainer}>
@@ -237,10 +218,21 @@ class MapScreen extends React.Component {
               key={JSON.stringify(marker.coordinate)}
               pinColor={marker.pinColor}
             >
-              <Callout style={styles.callout}>
-                <Text style={styles.name}>{marker.name}</Text>
-                <Text>Type : {marker.type}</Text>
+              <Callout
+                style={styles.callout}
+                tooltip
+                onPress={this.handleMarkerInfos}
+              >
+                <View style={styles.calloutHeader}>
+                  <Text style={styles.name}>{marker.name}</Text>
+                  <Text style={styles.type}>{marker.type}</Text>
+                </View>
                 <Text style={styles.description}>{marker.description}</Text>
+                <Button
+                  title="+ d'infos"
+                  titleStyle={{ color: "black" }}
+                  buttonStyle={styles.calloutButton}
+                />
               </Callout>
             </Marker>
           ))}
@@ -267,10 +259,6 @@ class MapScreen extends React.Component {
   }
 }
 
-MapScreen.navigationOptions = {
-  header: null
-};
-
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
@@ -284,20 +272,66 @@ const styles = StyleSheet.create({
   },
   callout: {
     flex: 1,
-    alignItems: "center"
+    alignItems: "center",
+    width: 200,
+    backgroundColor: "black",
+    borderRadius: 10
+  },
+  calloutHeader: {
+    alignItems: "center",
+    width: 170,
+    borderBottomWidth: 1,
+    borderColor: "white",
+    paddingBottom: 10,
+    paddingTop: 10
+  },
+  calloutButton: {
+    backgroundColor: "white",
+    width: 200,
+    borderWidth: 1,
+    borderColor: "black"
   },
   description: {
-    margin: 15
+    width: 150,
+    color: "white",
+    margin: 15,
+    textAlign: "center"
   },
   name: {
-    fontSize: 30,
+    color: "white",
+    fontSize: 20,
     fontWeight: "bold"
+  },
+  type: {
+    color: "orange",
+    fontSize: 9,
+    fontWeight: "bold"
+  },
+  modalBackground: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  modalContainer: {
+    width: 320,
+    height: 440,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderRadius: 10,
+    alignItems: "center"
   },
   modalTitle: {
     fontSize: 32,
     fontWeight: "bold",
     marginTop: 10,
     marginBottom: 10
+  },
+  modalQuit: {
+    backgroundColor: "orange",
+    width: 318,
+    borderTopEndRadius: 8,
+    borderTopStartRadius: 8
   },
   coordinate: {
     fontSize: 10
